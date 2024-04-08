@@ -11,7 +11,6 @@ def parse_option():
     parser = argparse.ArgumentParser('argument for pre-processing')
 
     parser.add_argument('--dataset_path', type=str, default="/users2/local/j20morli_sam_dataset/images/", help='root path of dataset')
-    parser.add_argument('--dataset_dir', type=str, help='dir of dataset')
     parser.add_argument('--features_path', type=str, default="/users2/local/j20morli_sam_dataset/SAM_vit_h_features/", help='root path of dataset')
 
     parser.add_argument('--device', type=str, default='cuda', help='device')
@@ -53,7 +52,6 @@ if __name__ == '__main__':
     predictor = SamPredictor(sam)
 
     dataset_dirs = ["sa_000022", "sa_000024", "sa_000070", "sa_000135", "sa_000137", "sa_000138", "sa_000477", "sa_000259", "sa_000977"]
-    dataset_dir = args.dataset_dir
     for dataset_dir in dataset_dirs :
         print(dataset_dir)
         extract_features(args.dataset_path, args.features_path, dataset_dir, predictor)
