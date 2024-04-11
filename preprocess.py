@@ -33,13 +33,22 @@ def extract_features(dataset_path, features_path, dataset_dir, predictor) :
 
     for i, test_image_path in enumerate(tqdm(test_image_paths)):
         if ".jpg" in test_image_path:
-            test_image = cv2.imread(os.path.join(test_image_dir, test_image_path))
-            test_image = cv2.cvtColor(test_image, cv2.COLOR_BGR2RGB)
 
-            predictor.set_image(test_image)
-            feature = predictor.features
+            results_path = os.path.join(features_path, dataset_dir, test_image_path).replace(".jpg", ".npy")
+            
+            # Check if results is already computed 
+            # could fail in case of process ending during saving
+            if not os.path.exists(results_path) :
+                # Load and process image
+                test_image = cv2.imread(os.path.join(test_image_dir, test_image_path))
+                test_image = cv2.cvtColor(test_image, cv2.COLOR_BGR2RGB)
 
-            np.save(os.path.join(features_path, dataset_dir, test_image_path).replace(".jpg", ".npy"), feature.cpu().numpy())# .astype(np.float16))
+                # Compute model results
+                predictor.set_image(test_image)
+                feature = predictor.features
+
+                # Save
+                np.save(os.path.join(features_path, dataset_dir, test_image_path).replace(".jpg", ".npy"), feature.cpu().numpy())# .astype(np.float16))
 
 if __name__ == '__main__':
 
@@ -55,3 +64,6 @@ if __name__ == '__main__':
     for dataset_dir in dataset_dirs :
         print(dataset_dir)
         extract_features(args.dataset_path, args.features_path, dataset_dir, predictor)
+        print(dataset_dir, " : preprocessed")
+
+    print("Finished !")
