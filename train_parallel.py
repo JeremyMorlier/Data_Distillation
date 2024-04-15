@@ -19,7 +19,7 @@ from mobile_sam.modeling import TinyViT
 from torch import distributed as dist
 from torch.utils.data.distributed import DistributedSampler
 
-from .common import parse_option, build_model, get_optimizer, get_scheduler, customized_mseloss
+from common import parse_option, build_model, get_optimizer, get_scheduler, customized_mseloss
             
 def test(args, model, test_loader):
     model.eval()
