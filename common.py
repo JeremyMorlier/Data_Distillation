@@ -46,7 +46,7 @@ def parse_option():
     parser.add_argument('--save_iters', type=int, default=50000, help='save iterations')
 
     # SAM directories used for training
-    parser.add_argument('--train_dirs', nargs='+', type=int)
+    parser.add_argument('--train_dirs', nargs='+', type=str)
 
     args = parser.parse_args()
     return args
