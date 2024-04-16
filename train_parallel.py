@@ -21,12 +21,12 @@ from torch.utils.data.distributed import DistributedSampler
 
 from common import parse_option, build_model, get_optimizer, get_scheduler, customized_mseloss
             
-def test(args, model, test_loader):
+def test(args, model, test_loader, local_rank):
     model.eval()
     test_loss = 0
     with torch.no_grad():
         for idx, (imgs, target_feats, mask_paths) in enumerate(test_loader):
-            imgs, target_feats = imgs.cuda(args.local_rank), target_feats.cuda(args.local_rank)
+            imgs, target_feats = imgs.cuda(local_rank), target_feats.cuda(local_rank)
             pred_feats = model.module(imgs)
             test_loss += customized_mseloss(pred_feats, target_feats).item()
 
@@ -40,13 +40,14 @@ def reduce_mean(tensor, nprocs):
     
 def main(args):
 
+    local_rank = int(os.environ["LOCAL_RANK"])
     # multi gpu settings
-    torch.cuda.set_device(args.local_rank)
-    device = torch.device('cuda', args.local_rank)
+    torch.cuda.set_device(local_rank)
+    device = torch.device('cuda', local_rank)
     torch.distributed.init_process_group(backend='nccl')
 
     # file folder creating
-    if args.local_rank == 0:
+    if local_rank == 0:
         if not os.path.exists(os.path.join(args.root_path, args.work_dir, args.save_dir)):
             os.makedirs(os.path.join(args.root_path, args.work_dir, args.save_dir))
         
@@ -77,14 +78,14 @@ def main(args):
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size // dist.get_world_size(), shuffle=(train_sampler is None), num_workers=args.num_workers, sampler=train_sampler, drop_last=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 
-    if args.local_rank == 0:
+    if local_rank == 0:
         writer = SummaryWriter(os.path.join(args.root_path, args.work_dir, args.log_dir))
 
     # model
     model = build_model()
     model.to(device)
     model = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model)
-    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True)
+    model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank], output_device=local_rank, find_unused_parameters=True)
     
     # optimizer and scheduler
     optimizer = get_optimizer(args, model)
@@ -94,7 +95,7 @@ def main(args):
 
     for epoch in range(1, args.epochs + 1):
         # new epoch
-        if args.local_rank == 0:
+        if local_rank == 0:
             print("------start epoch {}------".format(epoch))
         train_sampler.set_epoch(epoch)
 
@@ -112,7 +113,7 @@ def main(args):
             loss = reduce_mean(loss, dist.get_world_size())
             
             # if is master process
-            if args.local_rank == 0:
+            if local_rank == 0:
                 #print training info
                 if (batch_idx + 1) % args.print_iters == 0:
                     print('Train Epoch: {} [{}/{} ({:.0f}%)]\tMSE Loss: {:.6f}'.format(
@@ -138,7 +139,7 @@ def main(args):
         scheduler.step()
 
     # save final model
-    if args.local_rank == 0:
+    if local_rank == 0:
         torch.save(model.state_dict(), os.path.join(args.root_path, args.work_dir, args.save_dir, "iter_final.pth"))
         writer.close()
 
