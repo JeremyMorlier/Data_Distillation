@@ -20,8 +20,8 @@ class sa1b_dataset(Dataset):
         self.img_paths = []
         self.feat_paths = []
         for i, img_dir in enumerate(img_dirs):
-            img_names = os.listdir(os.path.join(root_path, "images/", img_dir))
-            self.img_paths += [os.path.join(root_path, "images/", img_dir, img_name) for img_name in img_names if ".jpg" in img_name]
+            img_names = os.listdir(os.path.join(root_path, img_dir))
+            self.img_paths += [os.path.join(root_path, img_dir, img_name) for img_name in img_names if ".jpg" in img_name]
 
             feat_names = os.listdir(os.path.join(feat_root, img_dir))
             self.feat_paths += [os.path.join(feat_root, img_dir, feat_name) for feat_name in feat_names if ".npy" in feat_name]
