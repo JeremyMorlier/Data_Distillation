@@ -40,6 +40,7 @@ def parse_option():
 
     # file and folder paths
     parser.add_argument('--root_path', type=str, default="/users/local/j20morli/MobileSAM-pytorch/MobileSAM/", help='root path')
+    parser.add_argument('--root_feat', type=str, default="/users/local/j20morli/MobileSAM-pytorch/MobileSAM/", help='root features path')
     parser.add_argument('--work_dir', type=str, default="work_dir", help='work directory')
     parser.add_argument('--save_dir', type=str, default="ckpt", help='save directory')
     parser.add_argument('--log_dir', type=str, default="log", help='save directory')
