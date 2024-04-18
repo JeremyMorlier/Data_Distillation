@@ -207,5 +207,5 @@ If you use MobileSAM in your research, please use the following BibTeX entry. :m
 
 ## My Commands
 ```
-torchrun -m --standalone --nnodes=1 --nproc-per-node=1 train_parallel --optim adamw --learning_rate 0.001 --weight_decay 0.0005 --epochs 8 --batch_size 8 --work_dir test --root_path ./ --root_feat /users2/local/j20morli_sam_dataset/SAM_Features --dataset_path /users2/local/j20morli_sam_dataset/ --train_dirs sa_000022 sa_000024 sa_000070 sa_000135 sa_000137 sa_000138 sa_000259 sa_000477 sa_000977
+torchrun -m --standalone --nnodes=1 --nproc-per-node=1 train_parallel.py --optim adamw --learning_rate 0.001 --weight_decay 0.0005 --epochs 8 --batch_size 8 --work_dir test --root_path ./ --root_feat /users2/local/j20morli_sam_dataset/SAM_vit_h_features --dataset_path /users2/local/j20morli_sam_dataset/ --train_dirs sa_000022 sa_000024 sa_000070 sa_000135 sa_000137 sa_000138 sa_000259 sa_000477 sa_000977
 ```
