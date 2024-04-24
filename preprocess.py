@@ -17,6 +17,9 @@ def parse_option():
     parser.add_argument('--sam_type', type=str, default="vit_h")
     parser.add_argument('--sam_ckpt', type=str, default="/users2/local/j20morli_sam_dataset/checkpoints/sam_vit_h_4b8939.pth")
 
+    # SAM directories used for training
+    parser.add_argument('--train_dirs', nargs='+', type=str)
+
     args = parser.parse_args()
     return args
 
@@ -61,6 +64,7 @@ if __name__ == '__main__':
     predictor = SamPredictor(sam)
 
     dataset_dirs = ["sa_000022", "sa_000024", "sa_000070", "sa_000135", "sa_000137", "sa_000138", "sa_000477", "sa_000259", "sa_000977"]
+    dataset_dirs = args.train_dirs
     for dataset_dir in dataset_dirs :
         print(dataset_dir)
         extract_features(args.dataset_path, args.features_path, dataset_dir, predictor)
