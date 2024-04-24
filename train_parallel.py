@@ -69,7 +69,7 @@ def main(args):
     #train_dirs = ["sa_" + str(i).zfill(6) for i in range(20)]*
     train_dirs = args.train_dirs
     #train_dirs = ["sa_000022"]
-    val_dirs = ['sa_000021']
+    val_dirs = ['sa_000022']
     train_dataset = sa1b_dataset(args.dataset_path, args.root_feat, train_dirs, transform)
     #train_dataset = normal_distribution_dataset(train_dirs, transform)
     val_dataset = sa1b_dataset(args.dataset_path, args.root_feat, val_dirs, transform, args.eval_nums)
