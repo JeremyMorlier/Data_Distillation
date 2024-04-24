@@ -4,6 +4,7 @@ import argparse
 import random
 import cv2
 import json
+import time
 
 import torch
 import torch.nn as nn
@@ -93,10 +94,13 @@ def main(args):
 
     total_iters = 0
 
+    if local_rank == 0:
+        init_time = time.time()
+
     for epoch in range(1, args.epochs + 1):
         # new epoch
         if local_rank == 0:
-            print("------start epoch {}------".format(epoch))
+            print("------start epoch {}------".format(epoch), time.strftime("%d %b %Y %H:%M:%S", time.gmtime()))
         train_sampler.set_epoch(epoch)
 
         # training
@@ -117,7 +121,7 @@ def main(args):
                 #print training info
                 if (batch_idx + 1) % args.print_iters == 0:
                     print('Train Epoch: {} [{}/{} ({:.0f}%)]\tMSE Loss: {:.6f}'.format(
-                        epoch, batch_idx * len(imgs), len(train_loader.dataset),
+                        epoch, batch_idx * len(imgs) * dist.get_world_size(), len(train_loader.dataset),
                             100. * batch_idx / len(train_loader), loss.item()))
                     writer.add_scalar("mse_loss", loss.item(), total_iters)
                 
@@ -142,7 +146,10 @@ def main(args):
     if local_rank == 0:
         torch.save(model.state_dict(), os.path.join(args.root_path, args.work_dir, args.save_dir, "iter_final.pth"))
         writer.close()
-
+        
+        training_time = time.time() - init_time
+        print("Training finished ! Training Time: ", training_time)
+    
 if __name__ == "__main__":
     args = parse_option()
     main(args)
